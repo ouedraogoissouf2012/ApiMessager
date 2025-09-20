@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  h2:
+    console:
+      enabled: false
+
+# Configuration spécifique Railway
+logging:
+  level:
+    com.school.notification: INFO
+    org.springframework.mail: INFO
+    root: INFO
+
+# Configuration WhatsApp pour production
+notification:
+  whatsapp:
+    web-api:
+      url: ${WHATSAPP_API_URL:https://your-whatsapp-service.com}
+  email:
+    from: ${EMAIL_FROM:ecampusnsia@gmail.com}
+    from-name: "Université Aube Nouvelle - Notifications"
