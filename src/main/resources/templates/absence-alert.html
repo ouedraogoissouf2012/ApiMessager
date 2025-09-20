@@ -1,0 +1,128 @@
+<!-- Template: absence-alert.html -->
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerte Absence</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .content {
+            padding: 30px;
+        }
+        .absence-details {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .absence-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .info-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            flex: 1;
+            min-width: 200px;
+            margin-right: 10px;
+        }
+        .action-required {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            border-radius: 0 0 10px 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚠️ Alerte Absence</h1>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour <strong th:text="${parentName}">Parent</strong>,</p>
+            
+            <p>Nous vous informons qu'une absence a été constatée :</p>
+            
+            <div class="absence-details">
+                <div class="absence-info">
+                    <div class="info-item">
+                        <strong>👤 Élève :</strong><br>
+                        <span th:text="${studentName}">Nom de l'élève</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📅 Date :</strong><br>
+                        <span th:text="${absenceDate}">Date d'absence</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <strong>📝 Motif :</strong><br>
+                    <span th:text="${reason}">Raison de l'absence</span>
+                </div>
+            </div>
+            
+            <div class="action-required">
+                <h3>📋 Action requise :</h3>
+                <p>Si cette absence est justifiée, merci de :</p>
+                <ul>
+                    <li>Nous faire parvenir un justificatif (certificat médical, mot d'excuse, etc.)</li>
+                    <li>Contacter l'école si l'absence se prolonge</li>
+                    <li>Nous informer des mesures prises</li>
+                </ul>
+            </div>
+            
+            <p>En cas d'absence non justifiée répétée, nous nous réservons le droit de prendre les mesures appropriées conformément au règlement intérieur.</p>
+            
+            <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+        </div>
+        
+        <div class="footer">
+            <p><strong th:text="${schoolName}">École</strong></p>
+            <p>📅 <span th:text="${currentDate}">Date</span></p>
+            <p>📧 contact@ecole.fr | 📞 01 23 45 67 89</p>
+        </div>
+    </div>
+</body>
+</html>

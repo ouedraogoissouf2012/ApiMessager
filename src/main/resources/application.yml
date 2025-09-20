@@ -1,0 +1,91 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: notification-service
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ecampusnsia@gmail.com
+    password: ${GMAIL_APP_PASSWORD:czhxnadyqeezfqni}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connection-timeout: 30000
+          timeout: 30000
+          write-timeout: 30000
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
+
+# Configuration personnalisée
+notification:
+  # Configuration Email
+  email:
+    from: ecampusnsia@gmail.com
+    from-name: "Université Aube Nouvelle - Notifications"
+
+  # Configuration WhatsApp Web (GRATUIT)
+  whatsapp:
+    web-api:
+      enabled: ${WHATSAPP_ENABLED:true}
+      url: ${WHATSAPP_API_URL:http://localhost:3000}
+    # Fallback: génération de liens si serveur indisponible
+    link-mode: true
+
+  school:
+    name: "Université Aube Nouvelle"
+
+  scheduling:
+    enabled: true
+    batch-size: 50
+    retry-attempts: 3
+    retry-delay: 5000
+
+# Documentation API
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.school.notification: DEBUG
+    org.springframework.mail: DEBUG

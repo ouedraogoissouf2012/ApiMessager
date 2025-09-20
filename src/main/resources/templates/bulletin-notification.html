@@ -1,0 +1,101 @@
+<!-- Template: bulletin-notification.html -->
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulletin disponible</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .highlight {
+            background-color: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            border-radius: 0 0 10px 10px;
+            font-size: 14px;
+        }
+        .icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Bulletin Disponible</h1>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour <strong th:text="${parentName}">Parent</strong>,</p>
+            
+            <div class="highlight">
+                <p><span class="icon">📋</span><strong>Le bulletin de <span th:text="${studentName}">Élève</span> est maintenant disponible !</strong></p>
+                <p><strong>Période :</strong> <span th:text="${period}">Trimestre</span></p>
+            </div>
+            
+            <p>Vous pouvez dès à présent consulter le bulletin scolaire de votre enfant en vous connectant à notre plateforme.</p>
+            
+            <div style="text-align: center;">
+                <a href="#" class="button">📖 Consulter le Bulletin</a>
+            </div>
+            
+            <p>Ce bulletin contient les notes, appréciations et commentaires des enseignants pour la période indiquée.</p>
+            
+            <p>Si vous avez des questions concernant les résultats ou souhaitez prendre rendez-vous avec l'équipe pédagogique, n'hésitez pas à nous contacter.</p>
+        </div>
+        
+        <div class="footer">
+            <p><strong th:text="${schoolName}">École</strong></p>
+            <p>📅 <span th:text="${currentDate}">Date</span></p>
+            <p>📧 contact@ecole.fr | 📞 01 23 45 67 89</p>
+        </div>
+    </div>
+</body>
+</html>

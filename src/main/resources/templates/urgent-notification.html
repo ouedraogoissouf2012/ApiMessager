@@ -1,0 +1,113 @@
+<!-- Template: urgent-notification.html -->
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Urgent</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .content {
+            padding: 30px;
+        }
+        .urgent-banner {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            color: #856404;
+            font-weight: bold;
+        }
+        .urgent-content {
+            background-color: #f8d7da;
+            border: 2px solid #dc3545;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            border-radius: 0 0 10px 10px;
+            font-size: 14px;
+        }
+        .contact-urgent {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 MESSAGE URGENT</h1>
+        </div>
+        
+        <div class="content">
+            <div class="urgent-banner">
+                ⚠️ ATTENTION - MERCI DE LIRE IMMÉDIATEMENT ⚠️
+            </div>
+            
+            <p>Bonjour <strong th:text="${parentName}">Parent</strong>,</p>
+            
+            <div class="urgent-content">
+                <p th:utext="${urgentMessage}">Message urgent</p>
+            </div>
+            
+            <div class="contact-urgent">
+                <p><strong>📞 Contact d'urgence :</strong></p>
+                <p>En cas de besoin immédiat, contactez-nous :</p>
+                <p>📧 urgence@ecole.fr | 📞 01 23 45 67 89</p>
+            </div>
+            
+            <p><em>Ce message nécessite votre attention immédiate. Merci de prendre les mesures appropriées.</em></p>
+        </div>
+        
+        <div class="footer">
+            <p><strong th:text="${schoolName}">École</strong></p>
+            <p>📅 <span th:text="${currentDate}">Date</span></p>
+            <p style="color: #dc3545; font-weight: bold;">MESSAGE PRIORITAIRE</p>
+        </div>
+    </div>
+</body>
+</html>
