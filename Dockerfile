@@ -29,7 +29,7 @@ RUN ls -la target/
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
 # Variables d'environnement pour Render
-ENV SPRING_PROFILES_ACTIVE=production
+ENV SPRING_PROFILES_ACTIVE=render
 
 # Créer utilisateur non-root pour sécurité
 RUN addgroup -g 1001 -S spring && \

@@ -1,10 +1,17 @@
-# Configuration production pour Render.com
+# Configuration spécifique pour Render.com
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:h2:mem:testdb}
+    # Render fournit DATABASE_URL au format postgresql://...
+    # On utilise JDBC_DATABASE_URL qui sera défini manuellement
+    url: ${JDBC_DATABASE_URL:jdbc:h2:mem:testdb}
     username: ${DATABASE_USER:sa}
     password: ${DATABASE_PASSWORD:password}
-    driver-class-name: ${DATABASE_DRIVER:org.h2.Driver}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 20000
+      idle-timeout: 300000
 
   jpa:
     hibernate:
@@ -14,6 +21,8 @@ spring:
     properties:
       hibernate:
         format_sql: false
+        jdbc:
+          time_zone: UTC
 
   h2:
     console:
@@ -23,7 +32,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: ${EMAIL_USERNAME:ecampusnsia@gmail.com}
-    password: ${EMAIL_PASSWORD:${GMAIL_APP_PASSWORD}}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -34,14 +43,14 @@ spring:
           timeout: 30000
           write-timeout: 30000
 
-# Configuration Render.com
+# Configuration serveur
 server:
   port: ${PORT:8080}
   error:
     whitelabel:
       enabled: false
 
-# Configuration notification pour production
+# Configuration notification
 notification:
   email:
     from: ${EMAIL_FROM:ecampusnsia@gmail.com}
@@ -62,29 +71,31 @@ notification:
     retry-attempts: ${RETRY_ATTEMPTS:3}
     retry-delay: ${RETRY_DELAY:5000}
 
-# Logging production
+# Logging optimisé pour Render
 logging:
   level:
     com.school.notification: INFO
     org.springframework.mail: WARN
     org.hibernate: WARN
+    org.springframework.web: INFO
     root: INFO
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{36} - %msg%n"
 
-# Documentation API (désactivée en prod par sécurité)
+# API Documentation
 springdoc:
   api-docs:
-    enabled: ${API_DOCS_ENABLED:false}
+    enabled: ${API_DOCS_ENABLED:true}
   swagger-ui:
-    enabled: ${SWAGGER_ENABLED:false}
+    enabled: ${SWAGGER_ENABLED:true}
+    path: /swagger-ui.html
 
-# Monitoring Render.com
+# Monitoring
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,env
   endpoint:
     health:
       show-details: when-authorized
