@@ -86,9 +86,14 @@ logging:
 springdoc:
   api-docs:
     enabled: ${API_DOCS_ENABLED:true}
+    path: /v3/api-docs
   swagger-ui:
     enabled: ${SWAGGER_ENABLED:true}
     path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    url: /v3/api-docs
+    disable-swagger-default-url: true
+    try-it-out-enabled: true
 
 # Monitoring
 management:

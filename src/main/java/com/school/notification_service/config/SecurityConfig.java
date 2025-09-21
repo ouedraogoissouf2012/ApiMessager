@@ -25,7 +25,17 @@ public class SecurityConfig {
             .cors().and()
             .csrf().disable()
             .authorizeHttpRequests(authz -> authz
-                .anyRequest().permitAll()  // ✅ PERMET TOUT POUR LES TESTS
+                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .requestMatchers("/api-docs/**").permitAll()
+                .requestMatchers("/webjars/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/error").permitAll()
+                .requestMatchers("/", "/index.html", "/static/**", "/public/**").permitAll()
+                .anyRequest().permitAll()
             )
             .headers(headers -> headers.frameOptions().disable()); // Pour H2 Console
             

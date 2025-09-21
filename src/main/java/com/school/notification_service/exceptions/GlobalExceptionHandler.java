@@ -117,17 +117,51 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * Gestion spécifique des erreurs de ressources statiques
+     */
+    @ExceptionHandler(org.springframework.web.servlet.NoHandlerFoundException.class)
+    public ResponseEntity<ApiResponse<String>> handleNoHandlerFoundException(
+            org.springframework.web.servlet.NoHandlerFoundException ex, WebRequest request) {
+
+        String requestUrl = ex.getRequestURL();
+
+        // Log mais ne pas traiter comme erreur critique si c'est des ressources statiques
+        if (requestUrl.contains(".js") || requestUrl.contains(".css") ||
+            requestUrl.contains(".ico") || requestUrl.contains(".png") ||
+            requestUrl.contains(".jpg") || requestUrl.contains(".svg")) {
+
+            logger.debug("Ressource statique non trouvée (normal): {}", requestUrl);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Ressource non trouvée: " + requestUrl));
+        }
+
+        logger.warn("Handler non trouvé pour: {}", requestUrl);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("Endpoint non trouvé: " + requestUrl));
+    }
+
+    /**
      * Gestion des erreurs non capturées
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleGenericException(
             Exception ex, WebRequest request) {
-        
+
+        // Filtrer les erreurs de ressources statiques pour éviter le spam de logs
+        String message = ex.getMessage();
+        if (message != null && (message.contains("No static resource") ||
+            message.contains(".js") || message.contains(".css"))) {
+
+            logger.debug("Erreur ressource statique (ignorée): {}", message);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Ressource non trouvée"));
+        }
+
         logger.error("Erreur non gérée: {}", ex.getMessage(), ex);
-        
+
         ApiResponse<String> response = ApiResponse.error(
             "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.");
-        
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
