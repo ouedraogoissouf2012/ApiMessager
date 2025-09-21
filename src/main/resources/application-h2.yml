@@ -1,31 +1,20 @@
-# Configuration spécifique pour Render.com
+# Configuration H2 simple pour Render.com (fallback)
 spring:
   datasource:
-    # Configuration conditionnelle : PostgreSQL si JDBC_DATABASE_URL existe, sinon H2
-    url: ${JDBC_DATABASE_URL:jdbc:h2:mem:testdb}
-    username: ${DATABASE_USER:sa}
-    password: ${DATABASE_PASSWORD:password}
-    driver-class-name: ${DATABASE_DRIVER:org.h2.Driver}
-    hikari:
-      maximum-pool-size: 5
-      minimum-idle: 1
-      connection-timeout: 20000
-      idle-timeout: 300000
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: false
-    database-platform: ${DATABASE_PLATFORM:org.hibernate.dialect.H2Dialect}
-    properties:
-      hibernate:
-        format_sql: false
-        jdbc:
-          time_zone: UTC
+    database-platform: org.hibernate.dialect.H2Dialect
 
   h2:
     console:
-      enabled: ${H2_CONSOLE_ENABLED:false}
+      enabled: false
 
   mail:
     host: smtp.gmail.com
@@ -45,9 +34,6 @@ spring:
 # Configuration serveur
 server:
   port: ${PORT:8080}
-  error:
-    whitelabel:
-      enabled: false
 
 # Configuration notification
 notification:
@@ -70,36 +56,27 @@ notification:
     retry-attempts: ${RETRY_ATTEMPTS:3}
     retry-delay: ${RETRY_DELAY:5000}
 
-# Logging optimisé pour Render
+# Logging optimisé
 logging:
   level:
     com.school.notification: INFO
     org.springframework.mail: WARN
     org.hibernate: WARN
-    org.springframework.web: INFO
     root: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{36} - %msg%n"
 
 # API Documentation
 springdoc:
   api-docs:
     enabled: ${API_DOCS_ENABLED:true}
-    path: /v3/api-docs
   swagger-ui:
     enabled: ${SWAGGER_ENABLED:true}
-    path: /swagger-ui.html
-    config-url: /v3/api-docs/swagger-config
-    url: /v3/api-docs
-    disable-swagger-default-url: true
-    try-it-out-enabled: true
 
 # Monitoring
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,env
+        include: health,info
   endpoint:
     health:
       show-details: when-authorized
