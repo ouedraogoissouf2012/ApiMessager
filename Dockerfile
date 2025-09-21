@@ -8,10 +8,11 @@ ENV SPRING_PROFILES_ACTIVE=railway
 WORKDIR /app
 
 # Copier le JAR
-COPY target/notification-service-*.jar app.jar
+COPY target/*.jar app.jar
 
 # Exposer le port
 EXPOSE 8080
+
 
 # Commande de démarrage
 ENTRYPOINT ["java", "-jar", "app.jar"]

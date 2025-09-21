@@ -1,0 +1,392 @@
+=================================================================
+                 DOCUMENT DE RÉFÉRENCE TECHNIQUE
+                    APPLICATION 
+                        Backend 
+=================================================================
+
+VERSION: 1.0
+DERNIÈRE MAJ: 19 septembre 2025
+OBJECTIF: Base de connaissance complète pour éviter les duplications
+         et maintenir la cohérence architecturale
+
+================================================
+================
+                     TABLE DES MATIÈRES
+=================================================================
+
+1. ARCHITECTURE SYSTÈME ACTUELLE
+2. INVENTORY COMPLET DU CODE EXISTANT
+3. RÈGLES DE DÉVELOPPEMENT ANTI-DUPLICATION
+4. HISTORIQUE DES PROBLÈMES & SOLUTIONS
+5. PATTERNS & CONVENTIONS ÉTABLIES
+6. CHECKLIST DE MAINTENANCE
+7. GUIDE DE DÉPANNAGE
+8. SCRIPTS & COMMANDES UTILES
+
+=================================================================
+1. ARCHITECTURE SYSTÈME ACTUELLE
+=================================================================
+
+🏗️ **STACK TECHNIQUE:**
+- **Framework**: Spring Boot 3.5.4 + Java 21
+- **Architecture**: Layered (Controller → Service → Repository → Entity)
+- **Database**: H2 (dev) / MySQL (prod) avec Spring Data JPA
+- **Security**: Spring Security (CSRF disabled, CORS enabled)
+- **Documentation**: SpringDoc OpenAPI 3 + Swagger UI
+- **Email**: Spring Mail + Thymeleaf templates
+- **WhatsApp**: Dual integration (Local Node.js + Facebook Graph API)
+- **Async**: @EnableAsync avec CompletableFuture
+- **Scheduling**: @EnableScheduling pour retry et cleanup
+- **Validation**: Jakarta Validation sur DTOs
+
+🌐 **PORTS & ENDPOINTS:**
+- **Application**: http://localhost:8083
+- **H2 Console**: http://localhost:8083/h2-console
+- **Swagger UI**: http://localhost:8083/swagger-ui.html
+- **API Docs**: http://localhost:8083/api-docs
+- **Health**: http://localhost:8083/actuator/health
+
+🔄 **PATTERN ARCHITECTURAL:**
+```
+NotificationController → NotificationService → EmailService/WhatsAppService
+                    ↓                       ↓
+ParentController ----→ ParentService ------→ ParentRepository
+                                           ↓
+                                   Parent/Notification Entities
+```
+
+🗂️ **STRUCTURE PACKAGES:**
+```
+com.school.notification_service/
+├── controllers/          # REST endpoints
+├── services/            # Business logic
+├── repositories/        # Data access
+├── entities/            # JPA entities
+├── Dto/                # Data Transfer Objects
+├── config/             # Configuration classes
+├── enumr/              # Enumerations
+└── exceptions/         # Error handling
+```
+
+
+=================================================================
+2. INVENTORY COMPLET DU CODE EXISTANT
+=================================================================
+
+⚠️ RÈGLE CRITIQUE: TOUJOURS VÉRIFIER CET INVENTAIRE AVANT TOUTE MODIFICATION
+
+📌 **ENDPOINTS REST EXISTANTS (NE PAS DUPLIQUER):**
+
+🔔 **NOTIFICATION CONTROLLER** (/api/notifications):
+- POST /bulletin                    - Notification bulletin disponible
+- POST /message                     - Message personnalisé aux parents
+- POST /bulk                        - Envoi en masse
+- GET /{notificationId}/status      - Statut de livraison
+- GET /parent/{parentId}/history    - Historique notifications parent
+- POST /retry-failed                - Reprendre notifications échouées
+- GET /statistics                   - Statistiques notifications
+- GET /health                       - Health check service
+
+👥 **PARENT CONTROLLER** (/api/parents):
+- POST /                           - Créer nouveau parent
+- PUT /{parentId}                  - Mettre à jour parent
+- GET /{parentId}                  - Récupérer parent par ID
+- GET /                           - Lister parents actifs
+- GET /search?name=               - Rechercher parents par nom
+- PATCH /{parentId}/toggle-status - Activer/désactiver parent
+- GET /statistics                 - Statistiques parents
+
+🏗️ **SERVICES EXISTANTS (NE PAS DUPLIQUER):**
+- **NotificationService**: Logique métier notifications, retry, statistiques
+- **EmailService**: Envoi emails via Spring Mail + templates Thymeleaf
+- **WhatsAppService**: Integration WhatsApp (local + Facebook Graph API)
+- **ParentService**: CRUD parents, recherche, statistiques
+
+🗃️ **ENTITIES JPA EXISTANTES:**
+- **Parent**: id, firstName, lastName, email, whatsappNumber, preferredChannel, isActive, createdAt, updatedAt
+- **Notification**: id, parent, type, subject, message, deliveryStatus, emailSent, whatsappSent, createdAt, sentAt, errorMessage
+
+📦 **DTOS EXISTANTS (NE PAS DUPLIQUER):**
+- **CreateParentRequest**: Création/mise à jour parent
+- **NotificationRequest**: Message personnalisé
+- **BulletinNotificationRequest**: Notification bulletin spécifique
+- **BulkNotificationRequest**: Envoi en masse
+- **NotificationResponse**: Réponse avec statut livraison
+- **ApiResponse<T>**: Wrapper standardisé pour toutes les réponses
+
+🔧 **REPOSITORIES EXISTANTS:**
+- **ParentRepository**: extends JpaRepository<Parent, Long> + recherche custom
+- **NotificationRepository**: extends JpaRepository<Notification, Long> + stats
+
+🎯 **ENUMERATIONS EXISTANTES:**
+- **MessageChannel**: EMAIL, WHATSAPP, BOTH
+- **NotificationType**: BULLETIN_NOTIFICATION, PARENT_MESSAGE, ABSENCE_ALERT, URGENT_NOTIFICATION
+- **DeliveryStatus**: PENDING, SENT, DELIVERED, FAILED, RETRYING
+
+⚙️ **CONFIGURATION CLASSES:**
+- **SecurityConfig**: CSRF disabled, CORS enabled
+- **AsyncConfig**: Configuration async avec thread pool
+- **OpenApiConfig**: Configuration Swagger/OpenAPI
+- **NotificationProperties**: @ConfigurationProperties custom
+- **NotificationScheduler**: Tâches programmées retry/cleanup
+- **DataInitializer**: Données de test au démarrage
+
+🔍 **VALIDATION & EXCEPTIONS:**
+- **GlobalExceptionHandler**: Gestion centralisée erreurs
+- **NotificationValidator**: Validation métier custom
+
+📄 **TEMPLATES THYMELEAF EXISTANTS:**
+- bulletin-notification.html
+- parent-message.html
+- absence-alert.html
+- urgent-notification.html
+
+
+
+
+
+=================================================================
+3. RÈGLES DE DÉVELOPPEMENT ANTI-DUPLICATION
+=================================================================
+
+🚨 RÈGLES ABSOLUES À RESPECTER:
+
+1. AVANT DE CRÉER UN ENDPOINT:
+   ❌ Vérifier dans la section "ENDPOINTS EXISTANTS" ci-dessus
+   ❌ Scanner l'existant
+   ✅ Étendre l'existant au lieu de dupliquer
+
+2. AVANT DE CRÉER UNE ENTITÉ:
+   ❌ Vérifier dans la section "ENTITIES JPA EXISTANTES" ci-dessus
+   ❌ Scanner le package entities/
+   ❌ Vérifier si l'entité Parent ou Notification peut être étendue
+   ✅ Ajouter des champs à l'entité existante si pertinent
+   ✅ Créer relations JPA appropriées (@OneToMany, @ManyToOne)
+
+3. AVANT DE CRÉER UN SERVICE:
+   ❌ Vérifier dans la section "SERVICES EXISTANTS" ci-dessus
+   ❌ Scanner le package services/
+   ❌ Vérifier si NotificationService ou ParentService peut être étendu
+   ✅ Ajouter des méthodes au service existant
+   ✅ Utiliser @Async pour opérations longues
+   ✅ Implémenter retry logic si nécessaire
+
+4. AVANT DE CRÉER UN DTO:
+   ❌ Vérifier dans la section "DTOS EXISTANTS" ci-dessus
+   ❌ Scanner le package Dto/
+   ❌ Vérifier si ApiResponse<T> peut wrapper votre données
+   ✅ Étendre le DTO existant ou créer une variante
+   ✅ Ajouter validation Jakarta (@Valid, @NotNull, @Email, etc.)
+
+5. AVANT DE CRÉER UN ENDPOINT:
+   ❌ Vérifier dans la section "ENDPOINTS REST EXISTANTS" ci-dessus
+   ❌ Scanner NotificationController et ParentController
+   ❌ Vérifier si endpoint similaire existe déjà
+   ✅ Étendre controller existant plutôt que créer nouveau
+   ✅ Utiliser patterns ApiResponse + @Operation pour Swagger
+
+🔄 **WORKFLOW OBLIGATOIRE:**
+
+**ÉTAPE 1: ANALYSER L'EXISTANT** ⚡
+- Lire INTÉGRALEMENT l'inventaire section 2
+- Scanner le code dans les packages concernés
+- Identifier les patterns existants (voir section 5)
+- Vérifier si la fonctionnalité existe DÉJÀ
+
+**ÉTAPE 2: RÉUTILISER OU ÉTENDRE** 🔧
+- TOUJOURS utiliser services/repositories existants
+- Étendre entités/DTOs au lieu de créer nouveaux
+- Suivre conventions nommage (voir section 5)
+- Utiliser ApiResponse<T> pour toutes les réponses REST
+- Ajouter @Operation et @Tag pour documentation Swagger
+
+**ÉTAPE 3: DÉVELOPPER AVEC PATTERNS ÉTABLIS** 🎯
+- Utiliser @Async pour opérations longues
+- Implémenter validation Jakarta sur DTOs
+- Gérer erreurs via GlobalExceptionHandler
+- Logger avec SLF4J (pattern existant)
+- Tester endpoints via Swagger UI
+
+**ÉTAPE 4: VALIDER LA COHÉRENCE** ✅
+- Respecter architecture layered
+- Maintenir la logique de sécurité (CORS, validation)
+- Tester intégration avec existant
+- Vérifier que health check fonctionne
+- Mettre à jour cet inventaire si nouvelles classes
+
+=================================================================
+4. HISTORIQUE DES PROBLÈMES & SOLUTIONS
+=================================================================
+
+📅 INCIDENT CRITIQUE 
+=====================================
+
+
+
+=================================================================
+5. PATTERNS & CONVENTIONS ÉTABLIES
+=================================================================
+
+🏗️ ARCHITECTURE PATTERNS:
+
+
+🎯 CONVENTIONS NOMMAGE:
+
+CONTROLLERS:
+-
+SERVICES:
+-
+REPOSITORIES:
+
+ENTITIES:
+- 
+DTOS:
+- 
+🔐 SÉCURITÉ PATTERNS:
+
+
+🗃️ DATA PATTERNS:
+
+PAGINATION: Spring Data Pageable standard
+RECHERCHE: Criteria queries dans repositories
+VALIDATION: Jakarta Validation sur DTOs
+MAPPING: MapStruct pour Entity <-> DTO
+TIMESTAMPS: @CreationTimestamp, @UpdateTimestamp
+
+=================================================================
+6. CHECKLIST DE MAINTENANCE
+=================================================================
+
+🔍 AVANT CHAQUE MODIFICATION:
+
+□ Lire cet inventaire complet (section 2)
+□ Scanner les packages concernés
+□ Identifier si fonctionnalité existe déjà
+□ Vérifier les patterns établis (section 5)
+□ Planifier réutilisation vs création
+
+🧪 PENDANT LE DÉVELOPPEMENT:
+
+□ Respecter les conventions de nommage
+□ Utiliser les services/repositories existants
+□ Maintenir la cohérence architecturale
+□ Ajouter validation appropriée
+□ Implémenter la sécurité selon les patterns
+
+✅ APRÈS CHAQUE MODIFICATION:
+
+□ Tester les endpoints concernés
+□ Vérifier l'authentification/autorisation
+□ Valider l'intégration avec l'existant
+□ Mettre à jour cet inventaire si nécessaire
+□ Documenter les nouveaux patterns
+
+🚨 EN CAS DE PROBLÈME:
+
+□ Consulter l'historique des incidents (section 4)
+□ Vérifier les logs d'application
+□ Tester les endpoints de base (/ping, /vehicles)
+□ Valider la configuration de sécurité
+□ Utiliser le guide de dépannage (section 7)
+
+=================================================================
+7. GUIDE DE DÉPANNAGE
+=================================================================
+
+🔧 PROBLÈMES COURANTS & SOLUTIONS:
+
+
+
+
+🩺 DIAGNOSTIC SYSTÉMATIQUE:
+
+1
+3. API FONCTIONNELLE:
+   
+4. SWAGGER UI:
+   
+=================================================================
+8. SCRIPTS & COMMANDES UTILES
+=================================================================
+
+🚀 DÉMARRAGE:
+
+# Démarrage standard
+mvn spring-boot:run
+
+# Démarrage avec profil dev
+
+# Démarrage sur port custom
+
+# Compilation et démarrage
+
+
+🧹 NETTOYAGE:
+
+# Arrêter tous les processus Java
+taskkill //F //IM java.exe
+
+# Clean complet Maven
+mvn clean
+
+# Rebuild complet
+mvn clean package
+
+🔍 DIAGNOSTIC:
+
+# Vérifier port utilisé
+netstat -ano | findstr :8083
+
+# Logs temps réel
+tail -f logs/application.log
+
+# Test connectivité DB
+psql -h localhost -p 5432 -U postgres -d auto_occasion_db
+
+📊 TESTS API:
+
+# Health check
+curl http://localhost:
+
+# Login admin
+curl -X POST http://localhost:
+     -H "Content-Type: application/json" \
+     
+
+
+# 
+#
+🔐 SÉCURITÉ:
+
+#
+=================================================================
+                         NOTES FINALES
+=================================================================
+
+📋 UTILISATION DE CE DOCUMENT:
+
+1. TOUJOURS consulter l'inventaire (section 2) avant développement
+2. RESPECTER les règles anti-duplication (section 3)
+3. DOCUMENTER tout nouveau pattern découvert
+4. METTRE À JOUR cet inventaire après modifications importantes
+5. UTILISER comme référence lors des reviews de code
+
+🎯 OBJECTIFS:
+
+✅ Éviter 100% des duplications de code
+✅ Maintenir cohérence architecturale
+✅ Accélérer le développement par réutilisation
+✅ Réduire les bugs par patterns éprouvés
+✅ Faciliter la maintenance long-terme
+
+📞 EN CAS DE DOUTE:
+
+- Consulter cet inventaire complet
+- Scanner le code existant
+- Privilégier extension vs création
+- Maintenir les patterns établis
+
+=================================================================
+FIN DU DOCUMENT DE RÉFÉRENCE TECHNIQUE
+Version 1.0 - 19 septembre 2025
+=================================================================
