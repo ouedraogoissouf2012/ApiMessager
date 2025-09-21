@@ -1,0 +1,90 @@
+# Configuration production pour Render.com
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: false
+
+  h2:
+    console:
+      enabled: false
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME:ecampusnsia@gmail.com}
+    password: ${EMAIL_PASSWORD:${GMAIL_APP_PASSWORD}}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connection-timeout: 30000
+          timeout: 30000
+          write-timeout: 30000
+
+# Configuration Render.com
+server:
+  port: ${PORT:8080}
+  error:
+    whitelabel:
+      enabled: false
+
+# Configuration notification pour production
+notification:
+  email:
+    from: ${EMAIL_FROM:ecampusnsia@gmail.com}
+    from-name: "Université Aube Nouvelle - Notifications"
+
+  whatsapp:
+    web-api:
+      enabled: ${WHATSAPP_ENABLED:false}
+      url: ${WHATSAPP_API_URL:https://api.whatsapp.com}
+    link-mode: true
+
+  school:
+    name: "Université Aube Nouvelle"
+
+  scheduling:
+    enabled: true
+    batch-size: ${BATCH_SIZE:50}
+    retry-attempts: ${RETRY_ATTEMPTS:3}
+    retry-delay: ${RETRY_DELAY:5000}
+
+# Logging production
+logging:
+  level:
+    com.school.notification: INFO
+    org.springframework.mail: WARN
+    org.hibernate: WARN
+    root: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Documentation API (désactivée en prod par sécurité)
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+
+# Monitoring Render.com
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

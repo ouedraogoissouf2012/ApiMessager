@@ -1,0 +1,45 @@
+# Fichiers à ignorer pour optimiser le build Docker
+
+# Répertoires de build
+target/
+!target/notification-service.jar
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Documentation
+README.md
+CLAUDE.md
+seven.txt
+*.md
+
+# Scripts de test
+*.bat
+*.sh
+
+# Configuration locale
+application-local.yml
+application-dev.yml
+
+# Railway config (pas nécessaire pour Render)
+railway.json
+
+# Autres
+node_modules/
+.env
